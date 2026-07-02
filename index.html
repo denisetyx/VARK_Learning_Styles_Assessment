@@ -657,7 +657,8 @@
       document.getElementById("progressPercent").textContent = `${progress}%`;
       document.getElementById("progressFill").style.width = `${progress}%`;
 
-      document.getElementById("questionNumber").textContent = currentQuestion.originalNumber;
+      document.getElementById("questionNumber").textContent =
+      "Question " + (currentQuestionIndex + 1);;
       document.getElementById("questionTitle").textContent = currentQuestion.question;
 
       const optionsContainer = document.getElementById("optionsContainer");
@@ -746,14 +747,15 @@
       return scores;
     }
 
-    function getDominantStyles(scores) {
-      const highestScore = Math.max(scores.V, scores.A, scores.R, scores.K);
+  function getDominantStyles(scores) {
+  const highestScore = Math.max(scores.V, scores.A, scores.R, scores.K);
 
-      return Object.keys(scores).filter(style => scores[style] === highestScore);
-    }
+  return Object.keys(scores).filter(function(style) {
+    return scores[style] === highestScore;
+  });
+}
 
 function showResult() {
-
   const scores = calculateScores();
 
   const scoreArray = [
@@ -763,16 +765,20 @@ function showResult() {
     { key: "K", score: scores.K }
   ];
 
-  scoreArray.sort((a, b) => b.score - a.score);
+  scoreArray.sort(function(a, b) {
+    return b.score - a.score;
+  });
 
-  const dominantStyle = scoreArray[0];
-
-  const highestScore = dominantStyle.score;
+  const highestScore = scoreArray[0].score;
 
   const dominantStyles = scoreArray
-  .filter(style => style.score === highestScore)
-  .map(style => style.key);
-  
+    .filter(function(style) {
+      return style.score === highestScore;
+    })
+    .map(function(style) {
+      return style.key;
+    });
+
   document.getElementById("quizScreen").classList.add("hidden");
   document.getElementById("resultScreen").classList.remove("hidden");
 
@@ -782,80 +788,85 @@ function showResult() {
   document.getElementById("scoreK").textContent = scores.K;
 
   if (dominantStyles.length === 1) {
+    document.getElementById("resultTitle").textContent =
+      styleContent[dominantStyles[0]].label;
 
-  document.getElementById("resultTitle").textContent =
-    styleContent[dominantStyle.key].label;
+    document.getElementById("dominantSummary").textContent =
+      "Your dominant learning style is " +
+      styleContent[dominantStyles[0]].label +
+      ".";
+  } else {
+    document.getElementById("resultTitle").textContent =
+      "Multiple Dominant Learning Styles";
 
-} else {
+    const dominantLabels = dominantStyles
+      .map(function(styleKey) {
+        return styleContent[styleKey].label;
+      })
+      .join(", ");
 
-  document.getElementById("resultTitle").textContent =
-    "Multiple Dominant Learning Styles";
-
-};
-
- if (dominantStyles.length === 1) {
-
-  document.getElementById("dominantSummary").textContent =
-    `Your dominant learning style is ${styleContent[dominantStyle.key].label}.`;
-
-} else {
-
-  document.getElementById("dominantSummary").textContent =
-    `You have multiple dominant learning styles with equal highest scores.`;
-
-}el}.`;
+    document.getElementById("dominantSummary").textContent =
+      "You have multiple dominant learning styles with equal highest scores: " +
+      dominantLabels +
+      ".";
+  }
 
   highlightDominantScores(dominantStyles);
 
-  const dominantSection =
-    document.getElementById("dominantSection");
+  const dominantSection = document.getElementById("dominantSection");
 
- dominantSection.innerHTML =
-  '<h3>Your Learning Style Spectrum</h3>' +
-  '<p>While <strong>' +
-  styleContent[dominantStyle.key].label +
-  '</strong> is your dominant learning style, most people use a blend of all four learning styles depending on the situation and context.</p>';
+  dominantSection.innerHTML =
+    "<h3>Your Learning Style Spectrum</h3>" +
+    "<p>While your highest-scoring style(s) represent your dominant learning preference, most people use a blend of all four learning styles depending on the situation and context.</p>";
 
-scoreArray.forEach(function(style) {
+  scoreArray.forEach(function(style) {
+    const styleCard = document.createElement("div");
+    styleCard.className = "style-card";
 
-  dominantSection.innerHTML +=
-    '<div class="style-card">' +
-      '<div class="style-name">' +
-        styleContent[style.key].label +
-        ' (' + style.score + '/10)' +
-      '</div>' +
-      '<p class="style-description">' +
-        styleContent[style.key].description +
-      '</p>' +
-    '</div>';
+    const styleName = document.createElement("div");
+    styleName.className = "style-name";
+    styleName.textContent =
+      styleContent[style.key].label + " (" + style.score + "/10)";
 
-});
+    const styleDescription = document.createElement("p");
+    styleDescription.className = "style-description";
+    styleDescription.textContent = styleContent[style.key].description;
 
-    function highlightDominantScores(dominantStyles) {
-      const boxes = {
-        V: document.getElementById("scoreBoxV"),
-        A: document.getElementById("scoreBoxA"),
-        R: document.getElementById("scoreBoxR"),
-        K: document.getElementById("scoreBoxK")
-      };
+    styleCard.appendChild(styleName);
+    styleCard.appendChild(styleDescription);
+    dominantSection.appendChild(styleCard);
+  });
+}
 
-      Object.values(boxes).forEach(box => box.classList.remove("dominant"));
+function highlightDominantScores(dominantStyles) {
+  const boxes = {
+    V: document.getElementById("scoreBoxV"),
+    A: document.getElementById("scoreBoxA"),
+    R: document.getElementById("scoreBoxR"),
+    K: document.getElementById("scoreBoxK")
+  };
 
-      dominantStyles.forEach(style => {
-        boxes[style].classList.add("dominant");
-      });
-    }
+  Object.keys(boxes).forEach(function(key) {
+    boxes[key].classList.remove("dominant");
+  });
 
-    function restartQuiz() {
-      currentQuestionIndex = 0;
-      answers = new Array(questions.length).fill(null);
+  dominantStyles.forEach(function(style) {
+    boxes[style].classList.add("dominant");
+  });
+}
 
-      document.getElementById("resultScreen").classList.add("hidden");
-      document.getElementById("startScreen").classList.remove("hidden");
+function restartQuiz() {
+  currentQuestionIndex = 0;
+  answers = new Array(questions.length).fill(null);
 
-      const boxes = document.querySelectorAll(".score-box");
-      boxes.forEach(box => box.classList.remove("dominant"));
-    }
+  document.getElementById("resultScreen").classList.add("hidden");
+  document.getElementById("startScreen").classList.remove("hidden");
+
+  const boxes = document.querySelectorAll(".score-box");
+  boxes.forEach(function(box) {
+    box.classList.remove("dominant");
+  });
+}
   </script>
 </body>
 </html>
