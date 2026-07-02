@@ -752,7 +752,7 @@
       return Object.keys(scores).filter(style => scores[style] === highestScore);
     }
 
-   function showResult() {
+function showResult() {
 
   const scores = calculateScores();
 
@@ -786,36 +786,26 @@
   const dominantSection =
     document.getElementById("dominantSection");
 
-  dominantSection.innerHTML = `
-    <h3>Your Learning Style Spectrum</h3>
+ dominantSection.innerHTML =
+  '<h3>Your Learning Style Spectrum</h3>' +
+  '<p>While <strong>' +
+  styleContent[dominantStyle.key].label +
+  '</strong> is your dominant learning style, most people use a blend of all four learning styles depending on the situation and context.</p>';
 
-    <p>
-      While <strong>${styleContent[dominantStyle.key].label}</strong>
-      is your dominant learning style, most people use a blend of all four
-      learning styles depending on the situation and context.
-    </p>
-  `;
+scoreArray.forEach(function(style) {
 
-  scoreArray.forEach(style => {
+  dominantSection.innerHTML +=
+    '<div class="style-card">' +
+      '<div class="style-name">' +
+        styleContent[style.key].label +
+        ' (' + style.score + '/10)' +
+      '</div>' +
+      '<p class="style-description">' +
+        styleContent[style.key].description +
+      '</p>' +
+    '</div>';
 
-    dominantSection.innerHTML += `
-      <div class="style-card">
-
-        <div class="style-name">
-          ${styleContent[style.key].label}
-          (${style.score}/10)
-        </div>
-
-        <p class="style-description">
-          ${styleContent[style.key].description}
-        </p>
-
-      </div>
-    `;
-
-  });
-
-}
+});
 
     function highlightDominantScores(dominantStyles) {
       const boxes = {
