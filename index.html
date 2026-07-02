@@ -446,8 +446,17 @@
       <!-- Result Screen -->
       <div id="resultScreen" class="hidden">
         <span class="result-badge">Your Learning Style Profile</span>
-
+      
         <div id="resultTitle" class="result-title"></div>
+
+        <p id="dominantSummary"
+        style="
+        font-weight:600;
+        color:#003f7d;
+        margin-top:8px;
+         ">
+        </p>
+
 
         <p>
           Below are your dominant learning style(s) and practical tips to leverage them at work.
@@ -534,7 +543,7 @@
         ]
       },
       {
-        originalNumber: "Q13",
+        originalNumber: "Q4",
         question: "When remembering something, you…",
         options: [
           { text: "Picture the layout or visual details in your mind", type: "V" },
@@ -544,7 +553,7 @@
         ]
       },
       {
-        originalNumber: "Q14",
+        originalNumber: "Q5",
         question: "When explaining something to others, you prefer…",
         options: [
           { text: "Use diagrams, charts, or sketches to make it clear", type: "V" },
@@ -554,7 +563,7 @@
         ]
       },
       {
-        originalNumber: "Q17",
+        originalNumber: "Q6",
         question: "When choosing a new product, you rely on…",
         options: [
           { text: "Comparing pictures or visual features side by side", type: "V" },
@@ -564,7 +573,7 @@
         ]
       },
       {
-        originalNumber: "Q18",
+        originalNumber: "Q7",
         question: "When solving a problem, you prefer…",
         options: [
           { text: "Draw diagrams or use visual tools to organize ideas", type: "V" },
@@ -574,7 +583,7 @@
         ]
       },
       {
-        originalNumber: "Q19",
+        originalNumber: "Q8",
         question: "When learning a new software tool, you would rather…",
         options: [
           { text: "Watch a tutorial video or see screenshots of the process", type: "V" },
@@ -584,7 +593,7 @@
         ]
       },
       {
-        originalNumber: "Q22",
+        originalNumber: "Q9",
         question: "When attending a training session, you like…",
         options: [
           { text: "Visual slides, diagrams, and color-coded charts", type: "V" },
@@ -594,7 +603,7 @@
         ]
       },
       {
-        originalNumber: "Q25",
+        originalNumber: "Q10",
         question: "When learning a new sport, you would rather…",
         options: [
           { text: "Watch diagrams or instructional videos showing techniques", type: "V" },
@@ -743,43 +752,70 @@
       return Object.keys(scores).filter(style => scores[style] === highestScore);
     }
 
-    function showResult() {
-      const scores = calculateScores();
-      const dominantStyles = getDominantStyles(scores);
+   function showResult() {
 
-      document.getElementById("quizScreen").classList.add("hidden");
-      document.getElementById("resultScreen").classList.remove("hidden");
+  const scores = calculateScores();
 
-      document.getElementById("scoreV").textContent = scores.V;
-      document.getElementById("scoreA").textContent = scores.A;
-      document.getElementById("scoreR").textContent = scores.R;
-      document.getElementById("scoreK").textContent = scores.K;
+  const scoreArray = [
+    { key: "V", score: scores.V },
+    { key: "A", score: scores.A },
+    { key: "R", score: scores.R },
+    { key: "K", score: scores.K }
+  ];
 
-      highlightDominantScores(dominantStyles);
+  scoreArray.sort((a, b) => b.score - a.score);
 
-      const resultTitle = dominantStyles.length === 1
-        ? styleContent[dominantStyles[0]].label
-        : "Multimodal Learning Profile";
+  const dominantStyle = scoreArray[0];
 
-      document.getElementById("resultTitle").textContent = resultTitle;
+  document.getElementById("quizScreen").classList.add("hidden");
+  document.getElementById("resultScreen").classList.remove("hidden");
 
-      const dominantSection = document.getElementById("dominantSection");
-      dominantSection.innerHTML = "";
+  document.getElementById("scoreV").textContent = scores.V;
+  document.getElementById("scoreA").textContent = scores.A;
+  document.getElementById("scoreR").textContent = scores.R;
+  document.getElementById("scoreK").textContent = scores.K;
 
-      dominantStyles.forEach(styleKey => {
-        const style = styleContent[styleKey];
+  document.getElementById("resultTitle").textContent =
+    styleContent[dominantStyle.key].label;
 
-        const styleCard = document.createElement("div");
-        styleCard.className = "style-card";
+  document.getElementById("dominantSummary").textContent =
+    `Your dominant learning style is ${styleContent[dominantStyle.key].label}.`;
 
-        styleCard.innerHTML = `
-          <div class="style-name">${style.label}</div>
-          <p class="style-description">${style.description}</p>
-        `;
+  highlightDominantScores([dominantStyle.key]);
 
-        dominantSection.appendChild(styleCard);
-      });
-    }
+  const dominantSection =
+    document.getElementById("dominantSection");
+
+  dominantSection.innerHTML = `
+    <h3>Your Learning Style Spectrum</h3>
+
+    <p>
+      While <strong>${styleContent[dominantStyle.key].label}</strong>
+      is your dominant learning style, most people use a blend of all four
+      learning styles depending on the situation and context.
+    </p>
+  `;
+
+  scoreArray.forEach(style => {
+
+    dominantSection.innerHTML += `
+      <div class="style-card">
+
+        <div class="style-name">
+          ${styleContent[style.key].label}
+          (${style.score}/10)
+        </div>
+
+        <p class="style-description">
+          ${styleContent[style.key].description}
+        </p>
+
+      </div>
+    `;
+
+  });
+
+}
 
     function highlightDominantScores(dominantStyles) {
       const boxes = {
