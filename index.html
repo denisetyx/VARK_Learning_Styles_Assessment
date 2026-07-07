@@ -807,7 +807,7 @@
     dominantSection.innerHTML = "";
 
     const heading = document.createElement("h3");
-    heading.textContent = "Your Learning Style Spectrum";
+    heading.textContent = "Your Learning Style Ranking";
     dominantSection.appendChild(heading);
 
     const intro = document.createElement("p");
@@ -815,14 +815,25 @@
       "While your highest-scoring style(s) represent your dominant learning preference, most people use a blend of all four learning styles depending on the situation and context.";
     dominantSection.appendChild(intro);
 
-    scoreArray.forEach(function(style) {
-      const styleCard = document.createElement("div");
-      styleCard.className = "style-card";
+    let previousScore = null;
+    let currentRank = 0;
 
-      const styleName = document.createElement("div");
-      styleName.className = "style-name";
-      styleName.textContent =
-        styleContent[style.key].label + " (" + style.score + "/10)";
+    scoreArray.forEach(function(style, index) {
+
+    if (style.score !== previousScore) {
+      currentRank = index + 1;
+      previousScore = style.score;
+    }
+
+  const styleCard = document.createElement("div");
+  styleCard.className = "style-card";
+
+  const styleName = document.createElement("div");
+  styleName.className = "style-name";
+
+  styleName.textContent =
+    "#" + currentRank + " " + styleContent[style.key].label;
+
 
       const styleDescription = document.createElement("p");
       styleDescription.className = "style-description";
